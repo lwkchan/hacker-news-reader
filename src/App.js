@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 const list = [
@@ -34,33 +33,60 @@ class App extends Component {
   }
 
   render() {
+    const { list, searchTerm } = this.state;
     return (
       <div className="list">
-      <form>
-        <input
-        type="text"
-        onChange={this.onSearchChange}
+        <Search
+          value={searchTerm}
+          onChange={this.onSearchChange}
         />
-      </form>
-        <ul>
-          {this.state.list.filter(isSearched(this.state.searchTerm)).map(item => {
-              return (<div key ={item.objectId}>
-                  <li>{item.details} - {item.status}</li>
-                  <ul><a href={item.url}>link</a></ul>
-                  <ul>
-                  <button
-                    onClick={()=>this.onDismiss(item.objectId)}
-                    type="button"
-                  >
-                    Dismiss
-                  </button>
-                </ul>
-              </div>)
-            })}
-        </ul>
+        <Table
+          list={list}
+          pattern={searchTerm}
+          onDismiss={this.onDismiss}
+        />
       </div>
     );
   }
 }
+
+class Search extends Component {
+  render () {
+    const { value, onChange } = this.props;
+    return (
+      <form>
+        <input
+        type="text"
+        value={value}
+        onChange={onChange}
+        />
+      </form>
+    )
+  }
+}
+
+class Table extends Component {
+  render() {
+    const { list, pattern, onDismiss } = this.props;
+    return (
+      <ul>
+        {list.filter(isSearched(pattern)).map(item => {
+            return (<div key ={item.objectId}>
+                <li>{item.details} - {item.status}</li>
+                <ul><a href={item.url}>link</a></ul>
+                <ul>
+                <button
+                  onClick={()=> onDismiss(item.objectId)}
+                  type="button"
+                >
+                  Dismiss
+                </button>
+              </ul>
+            </div>)
+          })}
+      </ul>
+  )}
+}
+
 
 export default App;
