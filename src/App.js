@@ -35,58 +35,63 @@ class App extends Component {
   render() {
     const { list, searchTerm } = this.state;
     return (
-      <div className="list">
-        <Search
-          value={searchTerm}
-          onChange={this.onSearchChange}
-        />
-        <Table
-          list={list}
-          pattern={searchTerm}
-          onDismiss={this.onDismiss}
-        />
+      <div className="page">
+        <div className="interactions">
+          <Search
+            value={searchTerm}
+            onChange={this.onSearchChange}
+          >
+            Search
+          </Search>
+          <Table
+            list={list}
+            pattern={searchTerm}
+            onDismiss={this.onDismiss}
+          />
+        </div>
       </div>
     );
   }
 }
 
-class Search extends Component {
-  render () {
-    const { value, onChange } = this.props;
-    return (
-      <form>
-        <input
-        type="text"
-        value={value}
-        onChange={onChange}
-        />
-      </form>
-    )
-  }
-}
+const Search = ({ value, onChange, children }) =>
+  <form>
+    {children} <input
+    type="text"
+    value={value}
+    onChange={onChange}
+    />
+  </form>
 
-class Table extends Component {
-  render() {
-    const { list, pattern, onDismiss } = this.props;
-    return (
-      <ul>
-        {list.filter(isSearched(pattern)).map(item => {
-            return (<div key ={item.objectId}>
-                <li>{item.details} - {item.status}</li>
-                <ul><a href={item.url}>link</a></ul>
-                <ul>
-                <button
-                  onClick={()=> onDismiss(item.objectId)}
-                  type="button"
-                >
-                  Dismiss
-                </button>
-              </ul>
-            </div>)
-          })}
-      </ul>
-  )}
-}
+const Table = ({ list, pattern, onDismiss }) =>
+  <div className="table">
+    {list.filter(isSearched(pattern)).map(item =>
+      <div key={item.objectID} className="table-row">
+        <span style={{ width: '40%' }}>
+          <a href={item.url}>{item.details}</a>
+        </span>
+        <span style={{ width: '30%' }}>
+          {item.status}
+        </span>
+        <span style={{ width: '30%' }}>
+          <Button
+            onClick={() => onDismiss(item.objectId)}
+            className="button-inline"
+          >
+            Dismiss
+          </Button>
+        </span>
+      </div>
+    )}
+  </div>
 
+const Button = ({onClick, className = '', children}) =>
+  <button
+    onClick={onClick}
+    className={className}
+    type="button"
+    >
+      {children}
+    </button>
 
 export default App;
