@@ -1,39 +1,53 @@
 import React, { Component } from 'react';
 import './App.css';
 
-const list = [
-  {objectId: 1, details:"Get milk", status: "done", url: "http://www.facebook.com"},
-  {objectId: 5, details:"Get water", status: "incomplete", url: "http://www.reddit.com"},
-  {objectId: 7, details:"Get some nuts", status: "done", url: "http://www.twitter.com"},
-  {objectId: 2, details:"Call mum", status: "done", url: "http://www.instagram.com"},
-  {objectId: 9, details:"Get cream", status: "incomplete", url: "http://www.example.com"},
-]
+const DEFAULT_QUERY = 'redux';
+
+const PATH_BASE = 'https://hn.algolia.com/api/v1';
+const PATH_SEARCH = '/search';
+const PARAM_SEARCH = 'query=';
 
 const isSearched = (searchTerm) => (item) =>
-  item.details.toLowerCase().includes(searchTerm.toLowerCase()) // returns true if the item details match the search term
+item.title.toLowerCase().includes(searchTerm.toLowerCase()) // returns true if the item details match the search term
 
 class App extends Component {
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
     this.state = {
-      list,
-      searchTerm: '',
+      result: null,
+      searchTerm: DEFAULT_QUERY,
     };
-    this.onDismiss = this.onDismiss.bind(this);
+    this.setSearchTopStories = this.setSearchTopStories.bind(this);
     this.onSearchChange = this.onSearchChange.bind(this);
+    this.onDismiss = this.onDismiss.bind(this);
   }
 
-  onDismiss(id) {
+  setSearchTopStories(result){
+    this.setState({ result })
+  }
+
+  componentDidMount(){
+    const { searchTerm } = this.state;
+
+    fetch(`${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}`)
+      .then(response => response.json())
+      .then(result => this.setSearchTopStories(result))
+      .catch(error => error);
+  }
+
+  onDismiss(id){
     const updatedList = this.state.list.filter(item => item.objectId !== id);
-    this.setState({ list: updatedList });
+    this.setState({ list: updatedList })
   }
 
-  onSearchChange(event) {
+  onSearchChange(event){
     this.setState({ searchTerm: event.target.value })
   }
 
   render() {
-    const { list, searchTerm } = this.state;
+    const { result, searchTerm } = this.state;
+    console.log(result);
+    if(!result) { return null; }
     return (
       <div className="page">
         <div className="interactions">
@@ -44,7 +58,7 @@ class App extends Component {
             Search
           </Search>
           <Table
-            list={list}
+            list={result.hits}
             pattern={searchTerm}
             onDismiss={this.onDismiss}
           />
@@ -56,7 +70,8 @@ class App extends Component {
 
 const Search = ({ value, onChange, children }) =>
   <form>
-    {children} <input
+    {children}
+    <input
     type="text"
     value={value}
     onChange={onChange}
@@ -68,7 +83,8 @@ const Table = ({ list, pattern, onDismiss }) =>
     {list.filter(isSearched(pattern)).map(item =>
       <div key={item.objectID} className="table-row">
         <span style={{ width: '40%' }}>
-          <a href={item.url}>{item.details}</a>
+          <a href={item.url}>{item.title}</a>
+          <p>{item.objectID}</p>
         </span>
         <span style={{ width: '30%' }}>
           {item.status}
