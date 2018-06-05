@@ -7,7 +7,7 @@ const PATH_BASE = 'https://hn.algolia.com/api/v1';
 const PATH_SEARCH = '/search';
 const PARAM_SEARCH = 'query=';
 
-const isSearched = (searchTerm) => (item) =>
+const isSearched = searchTerm => item =>
 item.title.toLowerCase().includes(searchTerm.toLowerCase()) // returns true if the item details match the search term
 
 class App extends Component {
@@ -36,8 +36,12 @@ class App extends Component {
   }
 
   onDismiss(id){
-    const updatedList = this.state.list.filter(item => item.objectId !== id);
-    this.setState({ list: updatedList })
+    const isNotId = item => item.objectID !== id;
+    const updatedList = this.state.result.hits.filter(isNotId);
+
+    this.setState({
+      result: Object.assign({}, this.state.result, { hits: updatedList })
+    })
   }
 
   onSearchChange(event){
@@ -46,7 +50,6 @@ class App extends Component {
 
   render() {
     const { result, searchTerm } = this.state;
-    console.log(result);
     if(!result) { return null; }
     return (
       <div className="page">
@@ -91,7 +94,7 @@ const Table = ({ list, pattern, onDismiss }) =>
         </span>
         <span style={{ width: '30%' }}>
           <Button
-            onClick={() => onDismiss(item.objectId)}
+            onClick={() => onDismiss(item.objectID)}
             className="button-inline"
           >
             Dismiss
