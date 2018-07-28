@@ -73,7 +73,7 @@ class App extends Component {
   onSearchSubmit(event) {
     const { searchTerm } = this.state;
     this.setState({ searchKey: searchTerm });
-    if (this.needsToSearchTopStires(searchTerm)) {
+    if (this.needsToSearchTopStories(searchTerm)) {
       this.fetchSearchTopStories(searchTerm);
     }
     event.preventDefault();
