@@ -67,7 +67,7 @@ class App extends Component {
   onSearchChange(event){
     const newSearchTerm = event.target.value
     this.setState({ searchTerm: newSearchTerm })
-    this.fetchSearchTopStories(newSearchTerm)
+    // this.fetchSearchTopStories(newSearchTerm)
   }
 
   onSearchSubmit(event) {
